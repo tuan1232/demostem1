@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Soạn Văn 9 - Kết Nối Tri Thức</title>
+  <style>
+    :root{
+      --accent:#0b74ff; --muted:#6b7280; --card:#ffffff; --bg:#f4f7fb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:var(--bg);color:#111}
+    .topbar{display:flex;align-items:center;gap:16px;padding:12px 20px;background:linear-gradient(90deg,var(--accent),#0060d9);color:#fff;position:sticky;top:0;z-index:50}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo img{height:42px;width:auto;border-radius:6px;background:#fff;padding:2px}
+    .brand{font-weight:700;font-size:18px}
+    .search{flex:1;display:flex}
+    .search input{width:100%;padding:10px;border-radius:8px;border:none;outline:none}
+    .nav-actions{display:flex;gap:8px}
+    .btn{background:#fff;color:var(--accent);padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+    .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.18)}
+
+    .wrap{max-width:1200px;margin:22px auto;padding:0 16px;display:grid;grid-template-columns:260px 1fr 300px;gap:18px}
+
+    /* Sidebar */
+    .sidebar{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(20,30,60,0.06)}
+    .section-title{font-weight:700;margin:0 0 8px 0}
+    .course-list{display:flex;flex-direction:column;gap:6px}
+    .course-item{padding:10px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .course-item.active{background:linear-gradient(90deg,#fff,#f1f6ff);color:#111;font-weight:600}
+
+    .lesson-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .lesson{padding:10px;border-radius:8px;background:#fbfdff;border:1px solid #eef4ff;cursor:pointer}
+    .lesson.locked{opacity:0.7}
+
+    /* Content */
+    .content{background:var(--card);padding:18px;border-radius:10px;min-height:360px;box-shadow:0 6px 18px rgba(20,30,60,0.06)}
+    .content h1{margin-top:0}
+    .meta{color:var(--muted);font-size:14px;margin-bottom:10px}
+
+    /* Right column (optional widgets) */
+    .aside{background:var(--card);padding:14px;border-radius:10px;height:fit-content;box-shadow:0 6px 18px rgba(20,30,60,0.06)}
+
+    /* Modals */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:80}
+    .modal{background:#fff;border-radius:12px;max-width:520px;width:94%;padding:18px}
+    .modal h2{margin-top:0}
+    .form-row{margin:8px 0}
+    label{font-size:13px;color:var(--muted)}
+    input[type=text],input[type=password]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eefb}
+
+    .onboard-steps{display:flex;flex-direction:column;gap:8px}
+    .step{background:#f8fbff;padding:10px;border-radius:8px;border:1px solid #e8f0ff}
+
+    /* small screens */
+    @media(max-width:920px){
+      .wrap{grid-template-columns:1fr;}
+      .aside{order:3}
+      .sidebar{order:2}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">
+      <img src="/mnt/data/4a04230b-1802-425a-ad37-08418062180c.png" alt="logo">
+      <div class="brand">Soạn Văn 9 — Kết Nối Tri Thức</div>
+    </div>
+
+    <div class="search" aria-hidden="false">
+      <input id="searchInput" placeholder="Tìm bài, tác giả, chủ đề..." aria-label="Tìm kiếm">
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn ghost" id="btn-settings" title="Cài đặt">Cài đặt</button>
+      <button class="btn" id="btn-login">Đăng nhập</button>
+      <button class="btn" id="btn-register">Đăng ký</button>
+    </div>
+  </header>
+
+  <main class="wrap" role="main">
+    <aside class="sidebar" aria-label="Danh mục">
+      <div class="section">
+        <h3 class="section-title">Soạn Văn 9 (Kết Nối Tri Thức)</h3>
+        <p class="meta">Chọn một chương để xem. Nội dung sẽ khóa nếu bạn chưa đăng nhập.</p>
+
+        <nav class="course-list" aria-label="Danh mục bài">
+          <div id="cat-1" class="course-item active">Kết nối tri thức - Toàn bộ</div>
+          <div id="cat-2" class="course-item">Tóm tắt & Phân tích</div>
+          <div id="cat-3" class="course-item">Bài tập trắc nghiệm</div>
+        </nav>
+
+        <div class="section-title" style="margin-top:14px">Danh sách bài</div>
+        <div class="lesson-list" id="lessonList">
+          <!-- JS will populate lessons -->
+        </div>
+      </div>
+    </aside>
+
+    <section class="content" id="mainContent">
+      <h1>Chào mừng đến với Soạn Văn 9</h1>
+      <p class="meta">Hệ thống soạn văn trực quan — dành cho học sinh và giáo viên. Đăng ký/Đăng nhập để mở khóa nội dung chi tiết.</p>
+
+      <div id="welcomeCard" style="display:block">
+        <p>Nếu đây là lần đầu bạn ghé, chúng mình có vài hướng dẫn nhanh.</p>
+        <ul>
+          <li>Nhấn <strong>Đăng ký</strong> để tạo tài khoản (lưu demo trên trình duyệt).</li>
+          <li>Sau khi đăng nhập, chọn bài bên trái để xem nội dung đầy đủ.</li>
+          <li>Bạn có thể tìm kiếm nhanh bằng thanh tìm kiếm ở trên cùng.</li>
+        </ul>
+      </div>
+
+      <article id="lessonArea" style="display:none">
+        <!-- Lesson content injected here -->
+      </article>
+    </section>
+
+    <aside class="aside" aria-label="Thông tin">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <h4 style="margin:0">Tài khoản</h4>
+          <p id="accountInfo" class="meta">Bạn chưa đăng nhập.</p>
+        </div>
+
+        <div>
+          <h4 style="margin:0">Tìm nhanh</h4>
+          <p class="meta">Gõ tên bài hoặc tác giả rồi Enter.</p>
+        </div>
+
+        <div>
+          <h4 style="margin:0">Hỗ trợ</h4>
+          <p class="meta">Muốn mình thêm chức năng? Bấm vào Cài đặt.</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modal backdrop (login/register/confirm) -->
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal" id="modalBox" role="document">
+      <!-- content injected from JS -->
+    </div>
+  </div>
+
+  <!-- Onboarding quick modal for first-time users -->
+  <div id="onboardBackdrop" class="modal-backdrop">
+    <div class="modal" role="document">
+      <h2>Chào mừng đến với Soạn Văn 9 🎓</h2>
+      <p>Đây là phiên bản demo để bạn mang đi thi STEM — dễ dùng, chạy trực tiếp trên trình duyệt.</p>
+      <div class="onboard-steps">
+        <div class="step"><strong>Bước 1:</strong> Bấm <em>Đăng ký</em> ở góc trên để tạo tài khoản demo (lưu trên trình duyệt).</div>
+        <div class="step"><strong>Bước 2:</strong> Đăng nhập, sau đó chọn bài học ở bên trái để mở nội dung.</div>
+        <div class="step"><strong>Bước 3:</strong> Bạn có thể mở rộng thêm bài, tải nội dung, hoặc yêu cầu mình gửi file HTML riêng từng bài.</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn" id="startNowBtn">Bắt đầu</button>
+        <button class="btn ghost" id="skipOnboard">Không hiển thị lần sau</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple demo data: lessons can be extended or loaded from files later
+    const lessons = [
+      {id:'b1',title:'Chuyện người con gái Nam Xương',locked:true,content:`<h2>Chuyện người con gái Nam Xương</h2><p><strong>Tác giả:</strong> Nguyễn Dữ (trích)</p><p><strong>Tóm tắt:</strong> ... (Nội dung mẫu cho demo)</p>`},
+      {id:'b2',title:'Lặng lẽ Sa Pa',locked:true,content:`<h2>Lặng lẽ Sa Pa</h2><p><strong>Tác giả:</strong> Nguyễn Thành Long</p><p>Nội dung tóm tắt...</p>`},
+      {id:'b3',title:'Chiếc lược ngà',locked:true,content:`<h2>Chiếc lược ngà</h2><p><strong>Tác giả:</strong> Nguyễn Quang Sáng</p><p>Nội dung tóm tắt...</p>`},
+      {id:'b4',title:'Mùa xuân nho nhỏ',locked:true,content:`<h2>Mùa xuân nho nhỏ</h2><p><strong>Tác giả:</strong> Thanh Hải</p><p>Nội dung tóm tắt...</p>`}
+    ];
+
+    // Populate lesson list
+    const lessonListEl = document.getElementById('lessonList');
+    lessons.forEach(l=>{
+      const d = document.createElement('div');
+      d.className = 'lesson';
+      if(l.locked) d.classList.add('locked');
+      d.tabIndex = 0;
+      d.innerText = l.title;
+      d.onclick = ()=> openLesson(l.id);
+      d.onkeypress = (e)=>{ if(e.key==='Enter') openLesson(l.id); }
+      lessonListEl.appendChild(d);
+    });
+
+    // UI elements
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modalBox = document.getElementById('modalBox');
+    const accountInfo = document.getElementById('accountInfo');
+    const mainContent = document.getElementById('mainContent');
+    const lessonArea = document.getElementById('lessonArea');
+
+    // Onboarding
+    const onboardBackdrop = document.getElementById('onboardBackdrop');
+    document.getElementById('startNowBtn').onclick = ()=>{
+      onboardBackdrop.style.display='none';
+      localStorage.setItem('seenOnboard','true');
+    }
+    document.getElementById('skipOnboard').onclick = ()=>{
+      onboardBackdrop.style.display='none';
+      localStorage.setItem('seenOnboard','true');
+    }
+    if(!localStorage.getItem('seenOnboard')){
+      onboardBackdrop.style.display='flex';
+    }
+
+    // Auth helpers (demo: simple localStorage users)
+    function updateAccountUI(){
+      const u = localStorage.getItem('currentUser');
+      accountInfo.innerText = u ? `Đang đăng nhập: ${u}` : 'Bạn chưa đăng nhập.';
+      document.getElementById('btn-login').style.display = u ? 'none' : 'inline-block';
+      document.getElementById('btn-register').style.display = u ? 'none' : 'inline-block';
+      document.getElementById('btn-settings').innerText = u ? 'Cài đặt' : 'Cài đặt';
+    }
+    updateAccountUI();
+
+    // Show modal helpers
+    function showModal(html){ modalBox.innerHTML = html; modalBackdrop.style.display='flex'; }
+    function closeModal(){ modalBackdrop.style.display='none'; modalBox.innerHTML=''; }
+
+    // Login / Register UI
+    document.getElementById('btn-login').onclick = ()=>{
+      showModal(`
+        <h2>Đăng nhập</h2>
+        <div class='form-row'><label for='loginUser'>Tên đăng nhập</label><input id='loginUser' type='text'></div>
+        <div class='form-row'><label for='loginPass'>Mật khẩu</label><input id='loginPass' type='password'></div>
+        <div style='display:flex;gap:8px;margin-top:12px'><button class='btn' id='doLogin'>Đăng nhập</button><button class='btn ghost' id='closeModal'>Hủy</button></div>
+      `);
+      document.getElementById('closeModal').onclick = closeModal;
+      document.getElementById('doLogin').onclick = ()=>{
+        const u = document.getElementById('loginUser').value.trim();
+        const p = document.getElementById('loginPass').value;
+        if(!u||!p){ alert('Vui lòng điền đủ thông tin'); return; }
+        const stored = localStorage.getItem(`user:${u}`);
+        if(stored && stored === p){ localStorage.setItem('currentUser',u); alert('Đăng nhập thành công'); closeModal(); updateAccountUI(); }
+        else alert('Sai tên đăng nhập hoặc mật khẩu');
+      }
+    }
+
+    document.getElementById('btn-register').onclick = ()=>{
+      showModal(`
+        <h2>Đăng ký</h2>
+        <div class='form-row'><label for='regUser'>Tên đăng nhập</label><input id='regUser' type='text'></div>
+        <div class='form-row'><label for='regPass'>Mật khẩu</label><input id='regPass' type='password'></div>
+        <div style='display:flex;gap:8px;margin-top:12px'><button class='btn' id='doReg'>Tạo tài khoản</button><button class='btn ghost' id='closeModal2'>Hủy</button></div>
+      `);
+      document.getElementById('closeModal2').onclick = closeModal;
+      document.getElementById('doReg').onclick = ()=>{
+        const u = document.getElementById('regUser').value.trim();
+        const p = document.getElementById('regPass').value;
+        if(!u||!p){ alert('Vui lòng điền đủ thông tin'); return; }
+        if(localStorage.getItem(`user:${u}`)){ alert('Tên đăng nhập đã tồn tại'); return; }
+        localStorage.setItem(`user:${u}`,p);
+        localStorage.setItem('currentUser',u);
+        alert('Đăng ký thành công và đã đăng nhập!');
+        closeModal(); updateAccountUI();
+      }
+    }
+
+    // Settings - simple demo
+    document.getElementById('btn-settings').onclick = ()=>{
+      const u = localStorage.getItem('currentUser');
+      if(!u){ showModal(`<h2>Cài đặt</h2><p class='meta'>Bạn cần đăng nhập để truy cập cài đặt tài khoản.</p><div style='display:flex;gap:8px;margin-top:12px'><button class='btn' id='goLogin'>Đăng nhập</button><button class='btn ghost' id='closeS'>Đóng</button></div>`);
+        document.getElementById('goLogin').onclick = ()=>{ closeModal(); document.getElementById('btn-login').click(); }
+        document.getElementById('closeS').onclick = closeModal;
+        return;
+      }
+      showModal(`<h2>Cài đặt tài khoản</h2><p class='meta'>Tài khoản: ${u}</p><div style='display:flex;gap:8px;margin-top:12px'><button class='btn' id='doLogout'>Đăng xuất</button><button class='btn ghost' id='closeS2'>Đóng</button></div>`);
+      document.getElementById('doLogout').onclick = ()=>{ localStorage.removeItem('currentUser'); alert('Đã đăng xuất'); closeModal(); updateAccountUI(); }
+      document.getElementById('closeS2').onclick = closeModal;
+    }
+
+    // Open lesson - check login
+    function openLesson(id){
+      const lesson = lessons.find(l=>l.id===id);
+      if(!lesson) return;
+      const user = localStorage.getItem('currentUser');
+      if(!user){
+        showModal(`<h2>Yêu cầu đăng nhập</h2><p class='meta'>Bạn cần đăng nhập hoặc đăng ký để xem nội dung: <strong>${lesson.title}</strong></p><div style='display:flex;gap:8px;margin-top:12px'><button class='btn' id='toLogin'>Đăng nhập</button><button class='btn' id='toReg'>Đăng ký</button><button class='btn ghost' id='canCancel'>Hủy</button></div>`);
+        document.getElementById('toLogin').onclick = ()=>{ closeModal(); document.getElementById('btn-login').click(); }
+        document.getElementById('toReg').onclick = ()=>{ closeModal(); document.getElementById('btn-register').click(); }
+        document.getElementById('canCancel').onclick = closeModal;
+        return;
+      }
+
+      // Show lesson
+      lessonArea.style.display = 'block';
+      lessonArea.innerHTML = `<div><h2>${lesson.title}</h2><p class='meta'>Mở bởi: ${user}</p>${lesson.content}<hr><p><em>Đây là nội dung demo. Nếu cần file HTML riêng cho bài này, hãy gõ: "Gửi bài: ${lesson.title}".</em></p></div>`;
+      // Smooth scroll to content
+      document.getElementById('mainContent').scrollIntoView({behavior:'smooth'});
+    }
+
+    // Search
+    document.getElementById('searchInput').addEventListener('keydown',function(e){ if(e.key==='Enter'){ const q=this.value.trim().toLowerCase(); if(!q) return; const found = lessons.find(l=>l.title.toLowerCase().includes(q)); if(found) openLesson(found.id); else alert('Không tìm thấy bài phù hợp'); } });
+
+    // Close modal on backdrop click
+    modalBackdrop.addEventListener('click',function(e){ if(e.target===modalBackdrop) closeModal(); });
+
+    // Update UI once more
+    updateAccountUI();
+
+    // Accessibility: focus trap not implemented in demo but elements are keyboard accessible
+  </script>
+</body>
+</html>
